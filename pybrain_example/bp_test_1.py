@@ -33,7 +33,9 @@ trainer = BP(net, ds)
 
 print ("start training ...")
 
-trainer.trainUntilConvergence(verbose=True, maxEpochs=400)
+#mse = trainer.train()
+
+trainer.trainUntilConvergence(verbose=True, maxEpochs=4)
 #for n in xrange(epo):
     #mse = trainer.train()
     #rmse = sqrt(mse)
