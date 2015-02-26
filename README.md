@@ -1,6 +1,10 @@
 # sklearn_pybrain_BP_adapter
 
+According to GoF, a adapter is for:
 
+"
+Convert the interface of a class into another interface clients expect. Adapter lets classes work together that couldn't otherwise because of incompatible interfaces.
+"
 userful links
 
 http://pybrain.org/pages/download
