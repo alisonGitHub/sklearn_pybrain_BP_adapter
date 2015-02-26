@@ -9,6 +9,7 @@ author:
 """
 
 import numpy as np
+import pandas as pd
 from sklearn.base import BaseEstimator, ClassifierMixin
 from pybrain.tools.shortcuts import buildNetwork
 from pybrain.supervised.trainers import BackpropTrainer as BP
@@ -20,7 +21,7 @@ from math import sqrt
 class BPClassifier(BaseEstimator, ClassifierMixin):
     """
 
-    for twp class for now.
+    for two class for now.
 
     """
 
@@ -69,9 +70,23 @@ class BPClassifier(BaseEstimator, ClassifierMixin):
         ds.setField('input', X)
         ds.setField('target', y_test_dumy)
 
-        self.p = self.net.activateOnDataset(ds)
-        pass
+        p = self.net.activateOnDataset(ds)
+        return p
 
 
 if __name__ == '__main__':
     pass
+    h_size = 5
+    epo = 100
+
+    train = pd.read_csv('./data/train.csv')
+
+    x_train = train.values[:, 0:-1]
+    y_train = np.array([[y] for y in train.values[:, -1]])
+
+    bpc = BPClassifier(h_size=h_size, epo=epo)
+
+    bpc.fit(x_train, y_train)
+
+    p = bpc.predict_proba(x_train)
+
