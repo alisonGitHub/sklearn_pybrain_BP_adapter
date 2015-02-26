@@ -6,8 +6,8 @@ from pybrain.tools.shortcuts import buildNetwork
 from pybrain.structure import TanhLayer
 from pybrain.structure import SoftmaxLayer
 from pybrain.supervised.trainers import BackpropTrainer as BP
-
 from pybrain.datasets.supervised import SupervisedDataSet
+
 import pandas as pd
 from math import sqrt
 import numpy as np
