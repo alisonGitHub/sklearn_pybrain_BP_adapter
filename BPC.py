@@ -10,7 +10,11 @@ author:
 
 import numpy as np
 import pandas as pd
+
 from sklearn.base import BaseEstimator, ClassifierMixin
+from sklearn.feature_selection import SelectKBest, f_regression
+from sklearn.pipeline import Pipeline
+
 from pybrain.tools.shortcuts import buildNetwork
 from pybrain.supervised.trainers import BackpropTrainer as BP
 from pybrain.datasets.supervised import SupervisedDataSet as SDS
@@ -91,8 +95,21 @@ if __name__ == '__main__':
 
     bpc = BPClassifier(h_size=h_size, epo=epo)
 
-    bpc.fit(x_train, y_train)
+    anova_filter = SelectKBest(f_regression, k=2)
 
-    p = bpc.predict_proba(x_train)
+    anova_bp = Pipeline([
+        ('anava', anova_filter),
+        ('bpc', bpc)
+    ])
 
-    p_c = bpc.predict(x_train)
+    anova_bp.fit(x_train, y_train)
+
+    p = anova_bp.predict_proba(x_train)
+
+    p_c = anova_bp.predict(x_train)
+
+    y_c = np.array([1 if yn > 0.5 else 0 for yn in y_train])
+
+    accuracy = float(sum([1 for tf in p_c == y_c if tf]))/float(len(p_c))
+
+    print "accuracy is %8.4" % accuracy
