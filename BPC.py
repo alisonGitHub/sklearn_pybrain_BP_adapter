@@ -14,6 +14,10 @@ import pandas as pd
 from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.feature_selection import SelectKBest, f_regression
 from sklearn.pipeline import Pipeline
+from sklearn.grid_search import GridSearchCV, RandomizedSearchCV
+from sklearn.metrics import precision_score
+
+from scipy.stats import randint as sp_randint
 
 from pybrain.tools.shortcuts import buildNetwork
 from pybrain.supervised.trainers import BackpropTrainer as BP
@@ -86,7 +90,7 @@ class BPClassifier(BaseEstimator, ClassifierMixin):
 
 
 if __name__ == '__main__':
-    pass
+
     h_size = 5
     epo = 3
 
@@ -95,25 +99,48 @@ if __name__ == '__main__':
     x_train = train.values[:, 0:-1]
     y_train = train.values[:, -1]
 
-    #test pipeline
-
     bpc = BPClassifier(h_size=h_size, epo=epo)
 
-    anova_filter = SelectKBest(f_regression, k=2)
+    #test pipeline
 
-    anova_bp = Pipeline([
-        ('anava', anova_filter),
-        ('bpc', bpc)
-    ])
+    #anova_filter = SelectKBest(f_regression, k=2)
+    #anova_bp = Pipeline([
+        #('anava', anova_filter),
+        #('bpc', bpc)
+    #])
 
-    anova_bp.fit(x_train, y_train)
+    #anova_bp.fit(x_train, y_train)
 
-    p = anova_bp.predict_proba(x_train)
+    #p = anova_bp.predict_proba(x_train)
 
-    p_c = anova_bp.predict(x_train)
+    #p_c = anova_bp.predict(x_train)
 
-    y_c = np.array([1 if yn > 0.5 else 0 for yn in y_train])
+    #y_c = np.array([1 if yn > 0.5 else 0 for yn in y_train])
 
-    accuracy = float(sum([1 for tf in p_c == y_c if tf]))/float(len(p_c))
+    #accuracy = float(sum([1 for tf in p_c == y_c if tf]))/float(len(p_c))
 
-    print "accuracy is %8.4f" % accuracy
+    #print "accuracy is %8.4f" % accuracy
+
+    # test gridsearch
+    param_dist = {"h_size": sp_randint(2, 10)}
+    clf = bpc
+    n_iter_search = 2
+    random_search = RandomizedSearchCV(clf,
+                                       param_distributions=param_dist,
+                                       n_iter=n_iter_search,
+                                       verbose=1,
+                                       scoring=precision_score
+                                       )
+	#scoring = getPred_Auc
+
+    print("start fitting ....")
+    random_search.fit(x_train,y_train)
+    print("Best parameters set found on development set:")
+    print()
+    print(random_search.best_estimator_)
+    print()
+    print("scores on development set:")
+    print()
+    for params, mean_score, scores in random_search.grid_scores_:
+        print("%0.3f (+/-%0.03f) for %r"
+              % (mean_score, scores.std() / 2, params))
