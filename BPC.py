@@ -57,7 +57,10 @@ class BPClassifier(BaseEstimator, ClassifierMixin):
         return self
 
     def predict(self, X):
-        pass
+        p = self.predict_proba(X)
+        p_class = np.array([1 if pn[0] > 0.5 else 0 for pn in p])
+
+        return p_class
 
     def predict_proba(self, X):
 
@@ -92,3 +95,4 @@ if __name__ == '__main__':
 
     p = bpc.predict_proba(x_train)
 
+    p_c = bpc.predict(x_train)
