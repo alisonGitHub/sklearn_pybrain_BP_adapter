@@ -31,13 +31,15 @@ class BPClassifier(BaseEstimator, ClassifierMixin):
         pass
 
     def fit(self, X, y):
+
+        y_train = np.array([[yn] for yn in y])
         _, self.in_size = X.shape
-        _, self.out_size = y.shape
+        _, self.out_size = y_train.shape
 
         ds = SDS(self.in_size, self.out_size)
 
         ds.setField('input', X)
-        ds.setField('target', y)
+        ds.setField('target', y_train)
 
         self.net = buildNetwork(self.in_size,
                                 self.h_size, self.out_size, bias=True)
@@ -77,12 +79,12 @@ class BPClassifier(BaseEstimator, ClassifierMixin):
 if __name__ == '__main__':
     pass
     h_size = 5
-    epo = 100
+    epo = 3
 
     train = pd.read_csv('./data/train.csv')
 
     x_train = train.values[:, 0:-1]
-    y_train = np.array([[y] for y in train.values[:, -1]])
+    y_train = train.values[:, -1]
 
     bpc = BPClassifier(h_size=h_size, epo=epo)
 
