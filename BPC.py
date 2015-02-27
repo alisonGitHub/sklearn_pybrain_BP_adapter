@@ -29,9 +29,10 @@ class BPClassifier(BaseEstimator, ClassifierMixin):
 
     """
 
-    def __init__(self, h_size=2, epo=2):
+    def __init__(self, h_size=2, epo=2, verbose=False):
         self.h_size = h_size
         self.epo = epo
+        self.verbose = verbose
         pass
 
     def fit(self, X, y):
@@ -57,7 +58,8 @@ class BPClassifier(BaseEstimator, ClassifierMixin):
         for n in xrange(self.epo):
             mse = trainer.train()
             rmse = sqrt(mse)
-            print ("RMSE = %8.3f epoch = %d" % (rmse, n))
+            if self.verbose:
+                print ("RMSE = %8.3f epoch = %d" % (rmse, n))
         return self
 
     def predict(self, X):
@@ -112,4 +114,4 @@ if __name__ == '__main__':
 
     accuracy = float(sum([1 for tf in p_c == y_c if tf]))/float(len(p_c))
 
-    print "accuracy is %8.4" % accuracy
+    print "accuracy is %8.4f" % accuracy
