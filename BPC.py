@@ -95,6 +95,8 @@ if __name__ == '__main__':
     x_train = train.values[:, 0:-1]
     y_train = train.values[:, -1]
 
+    #test pipeline
+
     bpc = BPClassifier(h_size=h_size, epo=epo)
 
     anova_filter = SelectKBest(f_regression, k=2)
