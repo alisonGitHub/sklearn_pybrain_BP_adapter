@@ -1,10 +1,10 @@
 """
 
-ref:
-    http://scikit-learn.org/stable/developers/index.html#rolling-your-own-estimator
+    ref:
+        http://scikit-learn.org/stable/developers/index.html#rolling-your-own-estimator
 
-author:
-    alisonbwen@gmail.com
+    author:
+        alisonbwen@gmail.com
 
 """
 
@@ -15,7 +15,7 @@ from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.feature_selection import SelectKBest, f_regression
 from sklearn.pipeline import Pipeline
 from sklearn.grid_search import GridSearchCV, RandomizedSearchCV
-from sklearn.metrics import precision_score
+from sklearn.metrics import precision_score, accuracy_score
 
 from scipy.stats import randint as sp_randint
 
@@ -27,11 +27,6 @@ from math import sqrt
 
 
 class BPClassifier(BaseEstimator, ClassifierMixin):
-    """
-
-    for two class for now.
-
-    """
 
     def __init__(self, h_size=2, epo=2, verbose=False):
         self.h_size = h_size
@@ -68,7 +63,8 @@ class BPClassifier(BaseEstimator, ClassifierMixin):
 
     def predict(self, X):
         p = self.predict_proba(X)
-        p_class = np.array([1 if pn[0] > 0.5 else 0 for pn in p])
+        #p_class = p
+        p_class = np.array([1 if pn > 0.5 else 0 for pn in p])
 
         return p_class
 
@@ -86,12 +82,12 @@ class BPClassifier(BaseEstimator, ClassifierMixin):
         ds.setField('target', y_test_dumy)
 
         p = self.net.activateOnDataset(ds)
-        return p
+        return np.array([pn[0] for pn in p])
 
 
 if __name__ == '__main__':
 
-    h_size = 5
+    h_size = 8
     epo = 3
 
     train = pd.read_csv('./data/train.csv')
@@ -99,8 +95,16 @@ if __name__ == '__main__':
     x_train = train.values[:, 0:-1]
     y_train = train.values[:, -1]
 
+    y_train_01 = np.array([1 if yn > 0.5 else 0 for yn in y_train])
+
     bpc = BPClassifier(h_size=h_size, epo=epo)
 
+    bpc.fit(x_train, y_train_01)
+
+    p = bpc.predict(x_train)
+
+    score = bpc.score(x_train, y_train_01)
+    print "score = ", score
     #test pipeline
 
     #anova_filter = SelectKBest(f_regression, k=2)
@@ -122,19 +126,21 @@ if __name__ == '__main__':
     #print "accuracy is %8.4f" % accuracy
 
     # test gridsearch
+    print "starting grid search ... "
     param_dist = {"h_size": sp_randint(2, 10)}
     clf = bpc
     n_iter_search = 2
     random_search = RandomizedSearchCV(clf,
                                        param_distributions=param_dist,
                                        n_iter=n_iter_search,
-                                       verbose=1,
-                                       scoring=precision_score
+                                       verbose=1
                                        )
-	#scoring = getPred_Auc
+                                       #,
+                                       #scoring=accuracy_score
+                                       #)
 
     print("start fitting ....")
-    random_search.fit(x_train,y_train)
+    random_search.fit(x_train, y_train_01)
     print("Best parameters set found on development set:")
     print()
     print(random_search.best_estimator_)
@@ -144,3 +150,4 @@ if __name__ == '__main__':
     for params, mean_score, scores in random_search.grid_scores_:
         print("%0.3f (+/-%0.03f) for %r"
               % (mean_score, scores.std() / 2, params))
+
