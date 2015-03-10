@@ -51,9 +51,6 @@ class BPClassifier(BaseEstimator, ClassifierMixin):
 
         print ("start training ...")
 
-        #mse = trainer.train()
-        #trainer.trainUntilConvergence(verbose=True, maxEpochs=4)
-
         for n in xrange(self.epo):
             mse = trainer.train()
             rmse = sqrt(mse)
@@ -62,10 +59,9 @@ class BPClassifier(BaseEstimator, ClassifierMixin):
         return self
 
     def predict(self, X):
-        p = self.predict_proba(X)
-        #p_class = p
-        p_class = np.array([1 if pn > 0.5 else 0 for pn in p])
 
+        p = self.predict_proba(X)
+        p_class = np.array([1 if pn > 0.5 else 0 for pn in p])
         return p_class
 
     def predict_proba(self, X):
